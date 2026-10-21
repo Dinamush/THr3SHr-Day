@@ -6,7 +6,7 @@ export const TAGGER_MODELS = [
   {
     id: "ml_danbooru",
     label: "ML-Danbooru",
-    help: "Loli-only classifier — strong recall on that folder (not used for full multi-folder runs).",
+    help: "Original ML-Danbooru tagger; WD models are recommended for full multi-folder runs.",
   },
   {
     id: "wd_swinv2_v3",

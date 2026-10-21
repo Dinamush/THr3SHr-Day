@@ -199,8 +199,7 @@
         "spitroast",
         "reverse_spitroast",
         "double_penetration",
-        "triple_penetration",
-        "oppai_loli"
+        "triple_penetration"
       ],
       "ignore": [
         "mature_male",
@@ -209,8 +208,7 @@
         "1girl",
         "1boy",
         "motherly",
-        "age_difference",
-        "oppai_loli"
+        "age_difference"
       ],
       "evidence": [
         {
@@ -454,95 +452,6 @@
         {
           "tag": "implied_fellatio",
           "weight": 0.5
-        }
-      ]
-    },
-    {
-      "id": "bestiality",
-      "folder": "bestiality",
-      "priority": 8,
-      "role": "act",
-      "aliases": [
-        "zoophilia",
-        "Bestiality"
-      ],
-      "ignore": [
-        "dog_girl",
-        "cat_girl",
-        "wolf_girl",
-        "fox_girl",
-        "animal_ears",
-        "fake_animal_ears",
-        "kemonomimi_mode",
-        "pokemon_(creature)",
-        "furry",
-        "furry_female",
-        "furry_male",
-        "animal_focus",
-        "pet_play",
-        "collar"
-      ],
-      "evidence": [
-        {
-          "tag": "bestiality",
-          "weight": 1.0
-        },
-        {
-          "tag": "animal_penis",
-          "weight": 0.9
-        },
-        {
-          "tag": "knot",
-          "weight": 0.85
-        },
-        {
-          "tag": "interspecies",
-          "weight": 0.75
-        }
-      ],
-      "gate_tags": [
-        "sex",
-        "penis",
-        "vaginal",
-        "rape",
-        "ejaculation"
-      ],
-      "gated_evidence": [
-        {
-          "tag": "dog",
-          "weight": 0.55
-        },
-        {
-          "tag": "cat",
-          "weight": 0.55
-        },
-        {
-          "tag": "horse",
-          "weight": 0.55
-        },
-        {
-          "tag": "pig",
-          "weight": 0.55
-        },
-        {
-          "tag": "cow",
-          "weight": 0.55
-        },
-        {
-          "tag": "wolf",
-          "weight": 0.5
-        },
-        {
-          "tag": "fox",
-          "weight": 0.5
-        },
-        {
-          "tag": "bear",
-          "weight": 0.5
-        },
-        {
-          "tag": "animal",
-          "weight": 0.45
         }
       ]
     },
@@ -1290,12 +1199,6 @@
       ],
       "veto_threshold": 0.35,
       "veto": [
-        "oppai_loli",
-        "onee-loli",
-        "mesugaki",
-        "onee-shota",
-        "onii-shota",
-        "miniboy",
         "incest",
         "twincest",
         "mother_and_son",
@@ -1303,7 +1206,6 @@
         "brother_and_sister",
         "mother_and_daughter",
         "father_and_son",
-        "bestiality",
         "animal_penis",
         "knot",
         "netorare",
@@ -1451,7 +1353,6 @@
         "tentacles_on_male",
         "tentacle_pit",
         "tentacles_under_clothes",
-        "bestiality",
         "animal_penis",
         "knot",
         "netorare",
@@ -3431,14 +3332,6 @@
         "reverse_spitroast",
         "double_penetration",
         "triple_penetration",
-        "oppai_loli",
-        "onee-loli",
-        "mesugaki",
-        "lolidom",
-        "toddlercon",
-        "onee-shota",
-        "onii-shota",
-        "miniboy",
         "incest",
         "twincest",
         "mother_and_son",
@@ -3446,7 +3339,6 @@
         "brother_and_sister",
         "mother_and_daughter",
         "father_and_son",
-        "bestiality",
         "animal_penis",
         "knot",
         "netorare",
@@ -3517,7 +3409,6 @@
         "cowgirl_position",
         "breast_grab",
         "groping",
-        "child_on_child",
         "aunt_and_niece",
         "cousins",
         "selfcest",

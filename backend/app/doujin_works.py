@@ -27,7 +27,6 @@ DOUJIN_FAVOURITE_FOLDERS: tuple[str, ...] = (
     "fertilization",
     "monster_girl",
     "incest",
-    "bestiality",
     "Pokemon",
     "NTR",
     "tentacles",

@@ -70,7 +70,6 @@ FAMILIES: dict[str, tuple[str, ...]] = {
         "top-down", "on_back", "on_stomach", "kneeling", "squatting", "m_legs",
         "legs_up", "leg_lift", "cameltoe", "suggestive",
     ),
-    "loli_shota": ("loli", "shota", "child", "young", "flat_chest", "petite"),
     "furry": ("furry", "kemono", "anthro", "fur", "snout", "paw", "digitigrade"),
     "monster_girl": (
         "monster_girl", "lamia", "harpy", "slime_girl", "mermaid", "centaur",

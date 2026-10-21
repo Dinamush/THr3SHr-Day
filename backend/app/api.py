@@ -2786,7 +2786,7 @@ def start_run(payload: StartRunRequest) -> StartRunResponse:
     if doujin_works:
         mode_note = (
             " Doujin works: one item per folder/cbz; sample-pool WD tags; "
-            "favourites milf/fertilization/monster_girl/incest/bestiality/"
+            "favourites milf/fertilization/monster_girl/incest/"
             "Pokemon/NTR/tentacles/furry/android; "
             "migrate moves into Doujins/<primary>/ with junctions for category tags."
         )

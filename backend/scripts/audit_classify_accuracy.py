@@ -24,17 +24,12 @@ SELECTED = {
     "incest",
     "nakadashi",
     "fellatio",
-    "loli",
-    "shota",
     "monster_girl",
     "furry",
     "Pokemon",
 }
 
 FIXTURES: list[tuple[str, dict[str, float], str | None]] = [
-    ("loli_hard", {"loli": 0.92, "flat_chest": 0.99}, "loli"),
-    ("fashion_fp", {"lolita_fashion": 0.99, "gothic_lolita": 0.95}, None),
-    ("shota_hard", {"shota": 0.88, "1boy": 0.99}, "shota"),
     ("ntr_hard", {"netorare": 0.8}, "NTR"),
     ("incest_hard", {"incest": 0.8, "siblings": 0.99}, "incest"),
     ("siblings_fp", {"siblings": 0.99}, None),

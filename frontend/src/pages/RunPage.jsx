@@ -27,7 +27,7 @@ const RUN_MODES = [
     label: () => "Doujin works",
     start: () => "Start Doujin works",
     help: () =>
-      "Treat each child folder or top-level .cbz as one work. Sample pages → WD → primary + category tags (milf / fertilization / monster_girl / incest / bestiality / Pokemon / NTR / tentacles / furry / android). Migrate moves into Doujins/<tag>/ with junctions.",
+      "Treat each child folder or top-level .cbz as one work. Sample pages → WD → primary + category tags (milf / fertilization / monster_girl / incest / Pokemon / NTR / tentacles / furry / android). Migrate moves into Doujins/<tag>/ with junctions.",
   },
 ];
 
