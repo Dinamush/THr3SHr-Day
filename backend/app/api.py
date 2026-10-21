@@ -75,6 +75,15 @@ from .doujin_works import (
     scan_doujin_works,
     write_tags_sidecar,
 )
+from .content_blocklist import (
+    REFUSED_REASON,
+    blocked_reason_for_destination,
+    blocked_reason_for_path,
+    blocked_reason_for_scores,
+    is_blocked_tag,
+    without_blocked_destinations,
+    without_blocked_tags,
+)
 from .hybrid_ml import merge_ml_allowlist_scores, should_run_hybrid_ml
 from .providers import probe_execution_providers
 from .storage import execute, execute_many, fetch_all, fetch_one, from_json, to_json, transaction
@@ -116,6 +125,73 @@ class _ImageInferenceResult:
 
 def _assignment_noise_floor(confidence_threshold: float) -> float:
     return max(0.15, float(confidence_threshold) * 0.5)
+
+
+def _refused_by_blocklist(
+    run_id: int, path: object, scores: dict[str, float], tags: list[str | None]
+) -> bool:
+    """True when the content blocklist refuses a classified item.
+
+    A refused item is skipped like a filtered one: it never becomes a row, so
+    nothing about it is stored, suggested or migrated.
+    """
+    if (
+        blocked_reason_for_scores(scores)
+        or blocked_reason_for_path(str(path))
+        or any(blocked_reason_for_destination(tag) for tag in tags if tag)
+    ):
+        logger.info("content_blocklist_refused run_id=%d", run_id)
+        return True
+    return False
+
+
+def _blocked_item_reason(row: dict, *tags: str | None) -> str:
+    """Why an existing item may not be approved or migrated, else ``""``.
+
+    Covers rows stored before the content blocklist existed: their tags,
+    destinations, path or stored scores may name blocked content.
+    """
+    names = [
+        *tags,
+        row.get("primary_tag"),
+        row.get("final_tag"),
+        row.get("suggested_destination"),
+        row.get("final_destination"),
+        *_secondary_tags_from_row(row),
+    ]
+    if any(blocked_reason_for_destination(name) for name in names if name):
+        return REFUSED_REASON
+    if blocked_reason_for_path(row.get("file_path")):
+        return REFUSED_REASON
+    if "full_scores_json" in row:
+        return blocked_reason_for_scores(_scores_from_json(row.get("full_scores_json")))
+    return ""
+
+
+def purge_content_blocked_items() -> int:
+    """Delete rows that route into a content-blocklist category.
+
+    Rows stored before the blocklist existed may carry such a tag or folder;
+    deleting them takes them off the review screen.  Media files are not
+    touched.
+    """
+    rows = fetch_all(
+        """
+        SELECT id, file_path, primary_tag, final_tag, suggested_destination,
+               final_destination, secondary_json
+        FROM items
+        """
+    )
+    blocked_ids = [int(row["id"]) for row in rows if _blocked_item_reason(row)]
+    for start in range(0, len(blocked_ids), _ID_CHUNK):
+        chunk = blocked_ids[start : start + _ID_CHUNK]
+        placeholders = ",".join("?" for _ in chunk)
+        with transaction() as conn:
+            conn.execute(f"DELETE FROM items WHERE id IN ({placeholders})", chunk)
+            conn.execute(
+                f"DELETE FROM item_global_tops WHERE item_id IN ({placeholders})", chunk
+            )
+    return len(blocked_ids)
 
 
 def _maybe_hybrid_ml_rescue(
@@ -958,12 +1034,16 @@ def _settings_from_db() -> AppSettings:
     selected_tags = from_json(selected_raw, default=[])
     if not isinstance(selected_tags, list):
         selected_tags = []
-    selected_tags = [str(t).strip() for t in selected_tags if str(t).strip()]
+    selected_tags = without_blocked_destinations(
+        [str(t).strip() for t in selected_tags if str(t).strip()]
+    )
     nsfw_raw = row.get("selected_tags_nsfw_json") or "[]"
     selected_tags_nsfw = from_json(nsfw_raw, default=[])
     if not isinstance(selected_tags_nsfw, list):
         selected_tags_nsfw = []
-    selected_tags_nsfw = [str(t).strip() for t in selected_tags_nsfw if str(t).strip()]
+    selected_tags_nsfw = without_blocked_destinations(
+        [str(t).strip() for t in selected_tags_nsfw if str(t).strip()]
+    )
     tagger_model = str(row.get("tagger_model") or "wd_swinv2_v3").strip()
     if tagger_model not in {"ml_danbooru", "wd_swinv2_v3", "wd_eva02_large"}:
         tagger_model = "wd_swinv2_v3"
@@ -1078,11 +1158,15 @@ def _item_from_row(row: dict, include_full_scores: bool = False) -> ClassifiedIt
     # List views must not touch full_scores_json — it dominates app.db I/O.
     scores: dict[str, float] = {}
     if include_full_scores:
-        scores = _scores_from_json(row.get("full_scores_json"))
+        scores = without_blocked_tags(_scores_from_json(row.get("full_scores_json")))
         global_tops = global_top_tags(scores) if scores else []
     else:
         stored_tops = from_json(row.get("global_top_json") or "[]", default=[])
-        global_tops = stored_tops if isinstance(stored_tops, list) else []
+        global_tops = [
+            top
+            for top in (stored_tops if isinstance(stored_tops, list) else [])
+            if not (isinstance(top, dict) and is_blocked_tag(str(top.get("tag") or "")))
+        ]
     return ClassifiedItem(
         id=row["id"],
         run_id=row["run_id"],
@@ -1259,6 +1343,7 @@ def _finalize_doujin_migrate(
     for tag in _secondary_tags_from_row(row):
         if tag not in tags:
             tags.append(tag)
+    tags = without_blocked_destinations(tags)
     write_tags_sidecar(destination, tags)
     for tag in tags:
         if primary_tag and tag == primary_tag:
@@ -1389,6 +1474,14 @@ def _execute_doujin_run(
                         avg_infer_ms_per_image=avg_ms,
                     )
 
+                    if _refused_by_blocklist(
+                        run_id,
+                        result.work.path,
+                        result.scores,
+                        [result.primary_tag, *(row.get("tag") for row in result.category_tags)],
+                    ):
+                        _update_run_progress(run_id, processed, failed)
+                        continue
                     secondary = [
                         {"tag": row["tag"], "score": row["score"]}
                         for row in result.category_tags
@@ -1415,7 +1508,7 @@ def _execute_doujin_run(
                             result.primary_tag,
                             result.primary_score,
                             to_json(secondary),
-                            to_json(result.scores),
+                            to_json(without_blocked_tags(result.scores)),
                             suggested_destination,
                             result.primary_tag,
                             suggested_destination,
@@ -1606,6 +1699,15 @@ def _execute_real_life_tag_run(
                         continue
 
                     primary = result.primary_tag
+                    if _refused_by_blocklist(
+                        run_id,
+                        path,
+                        result.scores,
+                        [primary, *(row.get("tag") for row in result.secondary)],
+                    ):
+                        processed += 1
+                        _update_run_progress(run_id, processed, failed)
+                        continue
                     dest = result.suggested_destination
                     if primary and not dest:
                         dest = str(real_life_destination(categories_root, primary))
@@ -1625,7 +1727,7 @@ def _execute_real_life_tag_run(
                             primary,
                             result.primary_score,
                             to_json(result.secondary),
-                            to_json(result.scores),
+                            to_json(without_blocked_tags(result.scores)),
                             dest,
                             primary,
                             dest,
@@ -1854,6 +1956,15 @@ def _execute_run(
                     )
 
                     for result in batch_results:
+                        if _refused_by_blocklist(
+                            run_id,
+                            result.image_path,
+                            result.scores,
+                            [result.primary_tag, *(row.get("tag") for row in result.secondary)],
+                        ):
+                            processed += 1
+                            _update_run_progress(run_id, processed, failed)
+                            continue
                         relative_path = str(result.image_path.relative_to(root_repo))
                         is_real_life_hit = (
                             result.primary_tag is not None
@@ -1892,7 +2003,7 @@ def _execute_run(
                                 result.primary_tag,
                                 result.primary_score,
                                 to_json(result.secondary),
-                                to_json(result.scores),
+                                to_json(without_blocked_tags(result.scores)),
                                 suggested_destination,
                                 result.primary_tag,
                                 suggested_destination,
@@ -2217,6 +2328,30 @@ def _execute_reclassify(
                         row = path_to_row.get(result.image_path)
                         if row is None:
                             continue
+                        if _refused_by_blocklist(
+                            run_id,
+                            result.image_path,
+                            result.scores,
+                            [result.primary_tag, *(r.get("tag") for r in result.secondary)],
+                        ):
+                            with transaction() as conn:
+                                cur = conn.execute(
+                                    """
+                                    DELETE FROM items
+                                    WHERE id = ? AND run_id = ? AND status = 'proposed'
+                                        AND needs_review = 1
+                                    """,
+                                    (row["id"], run_id),
+                                )
+                                if cur.rowcount:
+                                    conn.execute(
+                                        "DELETE FROM item_global_tops WHERE item_id = ?",
+                                        (row["id"],),
+                                    )
+                            processed += 1
+                            failed = _count_inference_failed_items(run_id)
+                            _update_run_progress(run_id, processed, failed)
+                            continue
                         suggested_destination = (
                             str(destination_path(categories_root, result.primary_tag))
                             if result.primary_tag is not None
@@ -2252,7 +2387,7 @@ def _execute_reclassify(
                                     result.primary_tag,
                                     result.primary_score,
                                     to_json(result.secondary),
-                                    to_json(result.scores),
+                                    to_json(without_blocked_tags(result.scores)),
                                     suggested_destination,
                                     new_final_tag,
                                     new_final_destination,
@@ -3192,6 +3327,10 @@ def update_item(item_id: int, payload: UpdateItemRequest) -> ClassifiedItem:
             if new_status in {"reviewed", "approved", "migrated"}
             else row["review_reason"]
         )
+    if blocked_reason_for_destination(new_final_tag) or (
+        new_status != "rejected" and _blocked_item_reason(row, new_final_destination)
+    ):
+        raise HTTPException(status_code=400, detail=REFUSED_REASON)
 
     with transaction() as conn:
         changed = conn.execute(
@@ -3223,7 +3362,7 @@ def get_item_scores(item_id: int) -> dict:
         raise HTTPException(status_code=404, detail="Item not found")
     return {
         "item_id": row["id"],
-        "full_scores": from_json(row.get("full_scores_json") or "{}", default={}),
+        "full_scores": without_blocked_tags(_scores_from_json(row.get("full_scores_json"))),
     }
 
 
@@ -3387,6 +3526,11 @@ def batch_update(run_id: int, payload: BatchUpdateRequest) -> dict:
                 if new_status in {"reviewed", "approved", "migrated"}
                 else row["review_reason"]
             )
+        if blocked_reason_for_destination(new_final_tag) or (
+            new_status != "rejected" and _blocked_item_reason(row, new_final_destination)
+        ):
+            skipped += 1
+            continue
         changes.append(
             (
                 new_status,
@@ -3454,6 +3598,18 @@ def migrate_run(run_id: int, payload: MigrateRequest) -> MigrateResponse:
         resolved_tag, resolved_dest = _resolve_item_assignment(
             row, categories_root=categories_root
         )
+        if _blocked_item_reason(row, resolved_tag, resolved_dest):
+            failed_count += 1
+            results.append(
+                {
+                    "item_id": row["id"],
+                    "source": str(source),
+                    "destination": None,
+                    "success": False,
+                    "error": REFUSED_REASON,
+                }
+            )
+            continue
         final_destination = resolved_dest or row["final_destination"]
         # Persist repaired assignment so retries and UI stay consistent.
         if resolved_tag and resolved_dest and (

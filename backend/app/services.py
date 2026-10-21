@@ -13,6 +13,12 @@ from pathlib import Path
 
 from PIL import Image, ImageFile, ImageOps
 
+from .content_blocklist import (
+    blocked_reason_for_path,
+    is_blocked_destination,
+    without_blocked_destinations,
+    without_blocked_tags,
+)
 from .media_pooling import pool_presence
 from .media_sampling import (
     DEFAULT_MEDIA_GIF_FRAME_STRIDE,
@@ -223,7 +229,8 @@ def load_known_tags(tags_csv_path: Path) -> set[str]:
             reader = csv.DictReader(f)
             for row in reader:
                 tag = (row.get("tag") or "").strip()
-                if tag:
+                # The content blocklist has no destination tag to offer.
+                if tag and not is_blocked_destination(tag):
                     tags.add(tag)
         cached = (stamp, frozenset(tags))
         _KNOWN_TAGS_CACHE[tags_csv_path] = cached
@@ -237,13 +244,15 @@ def discover_tag_folders(
         # Selected-tag runs may target a destination root that does not exist yet.
         if categories_root.exists() and not categories_root.is_dir():
             raise ValueError(f"categories_root exists but is not a directory: {categories_root}")
-        folder_names = selected_folders
+        folder_names = without_blocked_destinations(selected_folders)
     else:
         if not categories_root.exists() or not categories_root.is_dir():
             raise ValueError(
                 f"categories_root does not exist or is not a directory: {categories_root}"
             )
-        folder_names = sorted([p.name for p in categories_root.iterdir() if p.is_dir()])
+        folder_names = without_blocked_destinations(
+            sorted([p.name for p in categories_root.iterdir() if p.is_dir()])
+        )
 
     known_by_normalized: dict[str, str] = {}
     for tag in sorted(known_tags):
@@ -333,6 +342,7 @@ def scan_images(
     ignored_unsupported = 0
     ignored_gif = 0
     failed_to_read = 0
+    refused = 0
 
     iterator = root_repo.rglob("*") if recursive else root_repo.iterdir()
     for path in iterator:
@@ -356,6 +366,9 @@ def scan_images(
                 pass
 
         total_files += 1
+        if blocked_reason_for_path(str(path)):
+            refused += 1
+            continue
         ext = path.suffix.lower()
         if ext == ".gif":
             if not experimental_media_enabled:
@@ -390,7 +403,8 @@ def scan_images(
 
     logger.info(
         "scan_complete root=%s recursive=%s total_files=%d eligible=%d "
-        "ignored_gif=%d ignored_unsupported=%d failed_to_read=%d excluded_dirs=%d",
+        "ignored_gif=%d ignored_unsupported=%d failed_to_read=%d excluded_dirs=%d "
+        "refused_by_blocklist=%d",
         root_repo,
         recursive,
         total_files,
@@ -399,6 +413,7 @@ def scan_images(
         ignored_unsupported,
         failed_to_read,
         len(resolved_excludes),
+        refused,
     )
     return ScanOutput(
         image_paths=eligible,
@@ -637,7 +652,9 @@ def extract_scores_batch(
 
 
 def global_top_tags(scores: dict[str, float], limit: int = 5) -> list[dict[str, float]]:
-    ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)[:limit]
+    ranked = sorted(
+        without_blocked_tags(scores).items(), key=lambda item: item[1], reverse=True
+    )[:limit]
     return [{"tag": tag, "score": float(score)} for tag, score in ranked]
 
 
@@ -737,6 +754,7 @@ def destination_folders_for_tagger(
     *,
     real_life_filter: bool = False,
 ) -> list[str]:
-    """Folders for a run are the ones the caller selected."""
+    """Folders for a run are the ones the caller selected, less any the
+    content blocklist refuses."""
     del tagger_model, real_life_filter
-    return list(selected_folders)
+    return without_blocked_destinations(selected_folders)

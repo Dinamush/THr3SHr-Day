@@ -122,7 +122,11 @@ def startup() -> None:
     interrupted = fail_interrupted_runs()
     if interrupted:
         logger.warning("interrupted_runs_failed count=%d", interrupted)
-    from .api import _settings_from_db
+    from .api import _settings_from_db, purge_content_blocked_items
+
+    purged = purge_content_blocked_items()
+    if purged:
+        logger.warning("content_blocklist_items_purged count=%d", purged)
 
     settings = _settings_from_db()
     if settings.force_cpu_inference:

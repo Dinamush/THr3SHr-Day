@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 
+from .content_blocklist import BLOCK_SCORE_FLOOR, is_blocked_tag
+
 
 def pool_presence(
     frame_scores: list[tuple[float | None, dict[str, float]]],
@@ -23,6 +25,8 @@ def pool_presence(
       ``support_thr``) so 1-frame GIFs work. Thresholding matters because the
       media path scores with raw (dense) probabilities; without it a short
       clip would leak thousands of sub-threshold junk tags downstream.
+    - Content-blocklist tags skip the corroboration: their best frame stands,
+      so one blocked frame is enough to refuse the whole clip.
     """
     if not frame_scores:
         return {}
@@ -42,7 +46,7 @@ def pool_presence(
             best = max(float(scores.get(key, 0.0)) for _, scores in usable)
             if best >= thr_fallback:
                 out[key] = best
-        return out
+        return _keep_blocked_peaks(usable, out)
 
     scene_maps = _collapse_scenes(usable, scene_gap_s=scene_gap_s)
     keys = set()
@@ -61,6 +65,18 @@ def pool_presence(
         ranked = sorted(hits, reverse=True)
         take = ranked[: min(k, len(ranked))]
         pooled[key] = sum(take) / float(len(take))
+    return _keep_blocked_peaks(usable, pooled)
+
+
+def _keep_blocked_peaks(
+    usable: list[tuple[float | None, dict[str, float]]],
+    pooled: dict[str, float],
+) -> dict[str, float]:
+    for _, scores in usable:
+        for key, value in scores.items():
+            score = float(value)
+            if score >= BLOCK_SCORE_FLOOR and score > pooled.get(key, 0.0) and is_blocked_tag(key):
+                pooled[key] = score
     return pooled
 
 

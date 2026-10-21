@@ -306,7 +306,7 @@ nurse,nurse,NOUN,11777
 nurse_cap,cap,NOUN,16148
 spread_legs,leg,NOUN,184315
 stethoscope,stethoscope,NOUN,2737
-child,child,NOUN,36681
+,,,
 teddy_bear,bear,PROPN,20430
 comic,comic,NOUN,419576
 greyscale,greyscale,PROPN,383181
@@ -346,7 +346,7 @@ white_skirt,skirt,NOUN,51067
 bar_censor,censor,NOUN,91182
 cheerleader,cheerleader,NOUN,12295
 girl_on_top,girl,NOUN,44848
-loli,loli,PROPN,95421
+,,,
 pom_pom_(cheerleading),cheerleading,NOUN,11987
 reverse_cowgirl_position,position,NOUN,6425
 straddling,straddle,VERB,47051
@@ -390,7 +390,7 @@ cum_on_boy,cum,INTJ,2447
 heart_censor,censor,NOUN,13058
 high_heels,heel,NOUN,133899
 male_focus,focus,NOUN,386001
-shota,shota,PROPN,14638
+,,,
 testicles,testicle,NOUN,54635
 used_condom,condom,NOUN,9191
 on_stomach,on,ADP,45826
@@ -782,7 +782,7 @@ sailor_collar,collar,NOUN,170896
 sailor_senshi,senshi,PROPN,926
 sailor_senshi_uniform,uniform,NOUN,6795
 stomach_bulge,bulge,NOUN,5328
-bestiality,bestiality,NOUN,6053
+,,,
 dress_lift,lift,NOUN,25404
 scratches,scratch,NOUN,2386
 adjusting_hair,adjust,VERB,15146
@@ -845,7 +845,7 @@ green_theme,theme,NOUN,6210
 eromanga,eromanga,PROPN,0
 o_o,o,INTJ,20287
 6+girls,girl,NOUN,68203
-lolita_fashion,fashion,NOUN,21754
+,,,
 neck_ribbon,ribbon,NOUN,82369
 running,running,NOUN,21013
 grabbing_from_behind,grab,VERB,13734
@@ -1166,7 +1166,7 @@ v,v,NOUN,87729
 aqua_eyes,eye,NOUN,123691
 double_bun,bun,NOUN,86351
 gift_box,box,NOUN,14203
-gothic_lolita,lolita,NOUN,14212
+,,,
 hands_on_own_cheeks,hand,NOUN,5301
 mini_hat,hat,NOUN,18697
 headpat,headpat,PROPN,12481
@@ -1279,7 +1279,7 @@ scenery,scenery,NOUN,35459
 :3,:3,PUNCT,77394
 blank_eyes,eye,NOUN,6340
 branch,branch,NOUN,14765
-oppai_loli,loli,PROPN,3501
+,,,
 panda_girl,girl,NOUN,259
 sweating_profusely,sweat,VERB,5818
 v-shaped_eyebrows,eyebrow,NOUN,107712
@@ -1487,7 +1487,7 @@ sex_toy,toy,NOUN,37192
 shimakaze_(kancolle)_(cosplay),shimakaze,PROPN,2364
 sitting_on_desk,sit,VERB,2325
 vibrator,vibrator,NOUN,17143
-miniboy,miniboy,PROPN,3016
+,,,
 right-to-left_comic,comic,NOUN,350
 swallowing,swallow,VERB,475
 biting,biting,NOUN,11418
@@ -2253,7 +2253,7 @@ cross-laced_clothes,clothe,NOUN,11402
 green_ribbon,ribbon,NOUN,15166
 hand_on_own_head,hand,NOUN,9734
 hands_on_own_chest,hand,NOUN,11670
-lolita_hairband,hairband,PROPN,10529
+,,,
 shinai,shinai,PROPN,1236
 split_ponytail,ponytail,NOUN,1138
 yellow_ribbon,ribbon,NOUN,19366
@@ -2562,7 +2562,7 @@ jump_rope,rope,NOUN,569
 stadium,stadium,NOUN,1461
 out-of-frame_censoring,censoring,NOUN,8588
 imminent_vaginal,vaginal,ADJ,3721
-toddlercon,toddlercon,PROPN,650
+,,,
 looking_through_legs,look,VERB,885
 looking_at_breasts,look,VERB,1136
 imminent_kiss,kiss,NOUN,8413
@@ -2631,7 +2631,7 @@ tennis,tennis,NOUN,609
 tennis_court,court,NOUN,399
 tennis_net,net,NOUN,236
 tennis_uniform,uniform,NOUN,2274
-child_on_child,child,NOUN,2073
+,,,
 mutual_masturbation,masturbation,NOUN,715
 pink_bag,bag,NOUN,1417
 red_bag,bag,NOUN,1167
@@ -3203,7 +3203,7 @@ saliva_trail,trail,PROPN,13600
 golf_club,club,NOUN,865
 mount_fuji,fuji,PROPN,769
 birthday,birthday,NOUN,6345
-baby,baby,NOUN,4397
+,,,
 bamboo_broom,broom,NOUN,1569
 bamboo_steamer,steamer,NOUN,973
 baozi,baozi,PROPN,3238
@@ -3996,7 +3996,7 @@ holding_underwear,hold,VERB,3095
 holding_wand,hold,VERB,5024
 chin_strap,strap,NOUN,819
 ribbon-trimmed_clothes,clothe,NOUN,1914
-sweet_lolita,lolita,NOUN,544
+,,,
 tulip,tulip,PROPN,1307
 constellation,constellation,NOUN,3063
 perspective,perspective,NOUN,6223
@@ -5017,7 +5017,7 @@ hand_on_another's_chest,hand,NOUN,2786
 wreckage,wreckage,NOUN,485
 dripping,drip,VERB,7461
 wrong_feet,foot,NOUN,752
-kono_lolicon_domome,domome,PROPN,303
+,,,
 teasing,teasing,NOUN,1675
 variations,variation,NOUN,1793
 ivy,ivy,PROPN,765
@@ -5770,7 +5770,7 @@ prison,prison,NOUN,626
 prison_clothes,clothe,NOUN,932
 breast_awe,awe,NOUN,289
 age_comparison,comparison,NOUN,704
-toddler,toddler,NOUN,248
+,,,
 ring_necklace,necklace,NOUN,341
 blue_slime,slime,NOUN,0
 guided_breast_grab,grab,NOUN,1107
@@ -6634,7 +6634,7 @@ throwing,throwing,NOUN,3120
 hanasakigawa_school_uniform,uniform,NOUN,832
 green_hoodie,hoodie,NOUN,1753
 latte_art,art,NOUN,213
-wa_lolita,lolita,PROPN,875
+,,,
 hands_on_lap,hand,NOUN,2034
 arm_on_shoulder,arm,NOUN,477
 biceps,bicep,NOUN,5860
@@ -9603,7 +9603,7 @@ chaise_longue,longue,X,192
 clarent_(fate),clarent,PROPN,581
 pravda_military_uniform,uniform,NOUN,844
 natsuiro_egao_de_1_2_jump!,jump,NOUN,566
-cub,cub,NOUN,298
+,,,
 carried_breast_rest,rest,NOUN,530
 incoming_hug,hug,NOUN,597
 asahi_breweries,brewery,NOUN,370
@@ -9936,7 +9936,7 @@ leotard_pull,pull,NOUN,1727
 aqua_shorts,short,NOUN,475
 stuffed_pig,pig,NOUN,157
 breast_biting,biting,NOUN,144
-pedophile,pedophile,PROPN,157
+,,,
 mole_on_armpit,mole,NOUN,478
 admiral_(kancolle)_(cosplay),admiral,PROPN,388
 holding_pencil,hold,VERB,1802
@@ -11919,7 +11919,7 @@ moe2019,moe2019,NOUN,225
 coral_reef,reef,NOUN,370
 meteor_shower,shower,NOUN,454
 gothic_architecture,architecture,NOUN,253
-qi_lolita,lolita,PROPN,278
+,,,
 argyle_skirt,skirt,NOUN,134
 megumin_(cosplay),megumin,PROPN,175
 toy_car,car,NOUN,211
