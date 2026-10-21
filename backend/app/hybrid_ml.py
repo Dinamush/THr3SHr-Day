@@ -67,7 +67,6 @@ HYBRID_ML_ALLOWLIST: frozenset[str] = frozenset(
         # Other preferred folders with strong ML recall
         "furry",
         "pokemon_(creature)",
-        "removed",
         "animal_penis",
         "incest",
         "twincest",
