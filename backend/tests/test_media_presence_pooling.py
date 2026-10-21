@@ -27,7 +27,7 @@ from app.services import TAGGER_MODEL_WD_SWINV2, extract_scores_with_experimenta
 def test_pool_presence_single_hit_suppressed() -> None:
     pooled = pool_presence(
         [
-            (0.0, {"removed": 0.9, "1girl": 0.8}),
+            (0.0, {"milf": 0.9, "1girl": 0.8}),
             (1.0, {"1girl": 0.7}),
             (2.0, {"1girl": 0.6}),
             (3.0, {}),
@@ -36,24 +36,24 @@ def test_pool_presence_single_hit_suppressed() -> None:
         min_hits=2,
         scene_gap_s=None,
     )
-    assert "removed" not in pooled
+    assert "milf" not in pooled
     assert abs(pooled["1girl"] - ((0.8 + 0.7 + 0.6) / 3)) < 1e-9
 
 
 def test_pool_presence_two_hits_top_k_mean() -> None:
     pooled = pool_presence(
         [
-            (0.0, {"removed": 0.9}),
-            (1.0, {"removed": 0.1}),
-            (2.0, {"removed": 0.8}),
-            (3.0, {"removed": 0.2}),
+            (0.0, {"milf": 0.9}),
+            (1.0, {"milf": 0.1}),
+            (2.0, {"milf": 0.8}),
+            (3.0, {"milf": 0.2}),
         ],
         support_thr=0.35,
         min_hits=2,
         top_k=2,
         scene_gap_s=None,
     )
-    assert abs(pooled["removed"] - ((0.9 + 0.8) / 2)) < 1e-9
+    assert abs(pooled["milf"] - ((0.9 + 0.8) / 2)) < 1e-9
 
 
 def test_pool_presence_black_injection_stable() -> None:
@@ -72,22 +72,22 @@ def test_pool_presence_black_injection_stable() -> None:
 
 def test_pool_presence_short_media_still_semantics() -> None:
     pooled = pool_presence(
-        [(0.0, {"removed": 0.92})],
+        [(0.0, {"milf": 0.92})],
         support_thr=0.35,
         min_hits=2,
     )
-    assert abs(pooled["removed"] - 0.92) < 1e-9
+    assert abs(pooled["milf"] - 0.92) < 1e-9
 
 
 def test_pool_presence_short_media_fallback_thresholds_raw_junk() -> None:
     # Media path scores with raw (dense) probs; a 1-frame clip must not leak
     # sub-threshold junk tags through the still-semantics fallback.
     pooled = pool_presence(
-        [(0.0, {"removed": 0.92, "junk_a": 0.12, "junk_b": 0.30})],
+        [(0.0, {"milf": 0.92, "junk_a": 0.12, "junk_b": 0.30})],
         support_thr=0.35,
         min_hits=2,
     )
-    assert abs(pooled["removed"] - 0.92) < 1e-9
+    assert abs(pooled["milf"] - 0.92) < 1e-9
     assert "junk_a" not in pooled
     assert "junk_b" not in pooled
 
@@ -95,7 +95,7 @@ def test_pool_presence_short_media_fallback_thresholds_raw_junk() -> None:
 def test_pool_presence_omits_suppressed_keys() -> None:
     pooled = pool_presence(
         [
-            (0.0, {"removed": 0.9}),
+            (0.0, {"milf": 0.9}),
             (1.0, {"1girl": 0.8}),
             (2.0, {"1girl": 0.7}),
         ],
@@ -103,7 +103,7 @@ def test_pool_presence_omits_suppressed_keys() -> None:
         min_hits=2,
         scene_gap_s=None,
     )
-    assert "removed" not in pooled
+    assert "milf" not in pooled
     assert "1girl" in pooled
 
 
@@ -281,8 +281,8 @@ def test_experimental_media_gif_uses_presence_pool(monkeypatch, tmp_path: Path) 
         assert kwargs.get("raw_general") is True
         out = []
         for idx, _img in enumerate(images):
-            # Two frames above support for removed.
-            out.append({"removed": 0.9 if idx in (0, 2) else 0.05, "1girl": 0.5})
+            # Two frames above support for milf.
+            out.append({"milf": 0.9 if idx in (0, 2) else 0.05, "1girl": 0.5})
         return out
 
     class _Engine:
@@ -298,7 +298,7 @@ def test_experimental_media_gif_uses_presence_pool(monkeypatch, tmp_path: Path) 
         tagger_model=TAGGER_MODEL_WD_SWINV2,
         sample_count=4,
     )
-    assert scores["removed"] > 0.5
+    assert scores["milf"] > 0.5
     assert scores["1girl"] >= 0.5
 
 

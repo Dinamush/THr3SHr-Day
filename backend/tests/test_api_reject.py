@@ -36,7 +36,7 @@ def _seed(root: Path, cats: Path) -> tuple[int, int, Path]:
             src.name,
             None,
             None,
-            to_json([{"tag": "removed", "score": 0.4}]),
+            to_json([{"tag": "milf", "score": 0.4}]),
             to_json({}),
             None,
             None,

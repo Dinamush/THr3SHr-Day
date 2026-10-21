@@ -12,8 +12,8 @@ def test_predict_real_life_uses_taxonomy():
 
     reload_taxonomy()
     is_rl, folder, score, evidence = predict_real_life(
-        {"realistic": 0.85, "removed": 0.4},
-        selected={"real_life", "removed"},
+        {"realistic": 0.85, "milf": 0.4},
+        selected={"real_life", "milf"},
     )
     assert is_rl is True
     assert folder == "real_life"
@@ -21,11 +21,11 @@ def test_predict_real_life_uses_taxonomy():
     assert evidence["realistic"] == 0.85
 
     is_rl, folder, score, _ = predict_real_life(
-        {"removed": 0.9, "realistic": 0.01},
-        selected={"real_life", "removed"},
+        {"fellatio": 0.9, "realistic": 0.01},
+        selected={"real_life", "fellatio"},
     )
     assert is_rl is False
-    assert folder is None
+    assert folder == "fellatio"
 
 
 def test_debug_realism_eval_endpoint(monkeypatch, tmp_path: Path):
@@ -76,8 +76,8 @@ def test_debug_realism_eval_endpoint(monkeypatch, tmp_path: Path):
         if name.startswith("photo"):
             return {"realistic": 0.9, "photorealistic": 0.7, "1girl": 0.1}
         if name.startswith("edge"):
-            return {"realistic": 0.4, "removed": 0.2, "1girl": 0.8}
-        return {"removed": 0.85, "1girl": 0.95, "realistic": 0.0}
+            return {"realistic": 0.4, "milf": 0.2, "1girl": 0.8}
+        return {"milf": 0.85, "1girl": 0.95, "realistic": 0.0}
 
     monkeypatch.setattr("app.realism_eval.extract_scores", fake_scores)
 

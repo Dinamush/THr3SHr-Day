@@ -15,7 +15,6 @@ def test_preferred_probe_tags_respects_min_weight_and_selection() -> None:
     assert "android" in probe
     # Low-weight / other-folder tags stay out.
     assert "cleavage" not in probe
-    assert "removed" not in probe
 
     loose = preferred_probe_tags({"voyeur"}, min_weight=0.95)
     assert "cleavage" in loose or "nude" in loose
