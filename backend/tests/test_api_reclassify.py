@@ -58,7 +58,7 @@ def _patch_inference(monkeypatch, image_paths: list[Path], score_fn) -> None:
 
     monkeypatch.setattr("app.api.scan_images", fake_scan_images)
     monkeypatch.setattr("app.api.extract_scores", score_fn)
-    monkeypatch.setattr("app.api.load_known_tags", lambda _p: {"1girl", "loli", "solo"})
+    monkeypatch.setattr("app.api.load_known_tags", lambda _p: {"1girl", "milf", "solo"})
     monkeypatch.setattr(
         "app.api.discover_tag_folders",
         lambda _root, _tags, _selected: [

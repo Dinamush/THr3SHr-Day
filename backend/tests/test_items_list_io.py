@@ -17,12 +17,12 @@ def test_item_from_row_skips_scores_unless_requested() -> None:
         "run_id": 9,
         "file_path": "x.jpg",
         "relative_path": "x.jpg",
-        "primary_tag": "loli",
+        "primary_tag": "milf",
         "primary_score": 0.9,
         "secondary_json": "[]",
-        "full_scores_json": '{"loli": 0.9, "1girl": 0.99}',
+        "full_scores_json": '{"milf": 0.9, "1girl": 0.99}',
         "suggested_destination": None,
-        "final_tag": "loli",
+        "final_tag": "milf",
         "final_destination": None,
         "status": "proposed",
         "needs_review": 0,
@@ -32,9 +32,9 @@ def test_item_from_row_skips_scores_unless_requested() -> None:
     slim = _item_from_row(row, include_full_scores=False)
     assert slim.full_scores is None
     assert slim.global_top_tags == []
-    assert slim.primary_tag == "loli"
+    assert slim.primary_tag == "milf"
 
     full = _item_from_row(row, include_full_scores=True)
     assert full.full_scores is not None
-    assert full.full_scores["loli"] == 0.9
-    assert any(t.tag == "loli" for t in full.global_top_tags)
+    assert full.full_scores["milf"] == 0.9
+    assert any(t.tag == "milf" for t in full.global_top_tags)

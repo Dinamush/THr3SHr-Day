@@ -10,7 +10,7 @@ Run review showed many “no matching tags” / weak routing cases where:
 
 1. Strong **group** signals (`gangbang`, `group_sex`, `threesome`, `multiple_boys`, …) only reinforced catch-all **`sex`**, with no dedicated destination.
 2. **`milf`** evidence was essentially a single tag (`mature_female`), so mature women rarely won.
-3. Other favourite folders (`nakadashi`, `fellatio`, `loli`, `shota`, `incest`, `fertilization`, `bestiality`, `Pokemon`, `furry`, `android`, `tentacles`, `monster_girl`, `NTR`, `paizuri`, `footjob`) exist but need denser evidence / cleaner vetoes so they capture comprehensively without stealing Voyeur soft wins.
+3. Other favourite folders (`nakadashi`, `fellatio`, `incest`, `fertilization`, `Pokemon`, `furry`, `android`, `tentacles`, `monster_girl`, `NTR`, `paizuri`, `footjob`) exist but need denser evidence / cleaner vetoes so they capture comprehensively without stealing Voyeur soft wins.
 
 ## Goals
 
@@ -33,14 +33,11 @@ When **`group_sex`** would otherwise win:
 
 | Beats `group_sex` (override) | Loses to `group_sex` |
 |---|---|
-| `loli`, `shota` | `sex` |
-| `incest` | `milf` |
-| `bestiality` | `fellatio`, `nakadashi`, `paizuri`, `footjob` |
-| `NTR` | `fertilization` (same tier as other non-override acts) |
-| `Pokemon`, `furry`, `monster_girl`, `android` | |
-| `tentacles` | |
+| `incest` | `sex` |
+| `NTR` | `milf` |
+| `Pokemon`, `furry`, `monster_girl`, `android` | `fellatio`, `nakadashi`, `paizuri`, `footjob` |
+| `tentacles` | `fertilization` (same tier as other non-override acts) |
 
-Character ladder remains: **`loli` / `shota` still beat acts** via `prefer_character_over_act`.  
 **`milf` must not auto-beat `group_sex`** via the character ladder (see Implementation).
 
 ## Approach
@@ -66,9 +63,7 @@ Suggested fields:
 - `gate_tags` + `gated_evidence` (optional): count cues like `multiple_boys`, `3boys`, `4boys`, `6+boys`, `multiple_girls` only when a sex/penis/vaginal/rape gate is present (avoid multi-character SFW false wins)
 - `ignore`: bare `1boy`/`2boys`/`hetero`/`penis` without group markers
 - `veto`: key tags from override folders, e.g.:
-  - loli/shota: `loli`, `shota`, `oppai_loli`, `onee-shota`, …
   - incest: `incest`, `twincest`, `mother_and_son`, …
-  - bestiality: `bestiality`, `animal_penis`, `knot`, …
   - NTR: `netorare`, `cheating_(relationship)`
   - Pokemon/furry/monster_girl/android/tentacles: primary evidence tags already used by those buckets (`pokemon_(creature)`, `pokephilia`, `furry`, `monster_girl`, `android`, `tentacle_sex`, …)
 - `veto_threshold`: modest (align with existing act veto practice; avoid silencing on noise — prefer ~0.3–0.45 for rare override tags)
@@ -82,15 +77,15 @@ Suggested fields:
 ### 3. Update `milf`
 
 - `role`: `theme` (was `character`).
-- Expand `evidence` beyond `mature_female` with high-precision mature cues; keep aggressive `ignore` for `loli`, `shota`, `oppai_loli`, age-regression, etc.
+- Expand `evidence` beyond `mature_female` with high-precision mature cues; keep aggressive `ignore` for age-regression and similar tags.
 - Do **not** treat weak `motherly` / `age_difference` alone as enough to win.
 
 ### 4. Evidence refresh (listed folders)
 
-For each of: `nakadashi`, `fellatio`, `loli`, `shota`, `incest`, `fertilization`, `bestiality`, `Pokemon`, `furry`, `android`, `tentacles`, `monster_girl`, `NTR`, `paizuri`, `footjob`:
+For each of: `nakadashi`, `fellatio`, `incest`, `fertilization`, `Pokemon`, `furry`, `android`, `tentacles`, `monster_girl`, `NTR`, `paizuri`, `footjob`:
 
 - Add missing high-precision Danbooru aliases / variants already common in WD outputs.
-- Prefer **gated_evidence** for ambiguous species/count/body tags (pattern already used by bestiality / tentacles / android).
+- Prefer **gated_evidence** for ambiguous species/count/body tags (pattern already used by tentacles / android).
 - Keep / extend **ignore** lists so soft body tags cannot solo a folder.
 - Ensure override folders’ **primary evidence tags** appear on `group_sex.veto` so precedence holds even when scores are close.
 
@@ -112,11 +107,8 @@ Extend `backend/tests/test_taxonomy.py` and/or `test_classify_accuracy.py` matri
 |---|---|
 | `gangbang` / `group_sex` strong | `group_sex` |
 | `sex`/`vaginal` only | `sex` |
-| `gangbang` + `loli` | `loli` |
-| `gangbang` + `shota` | `shota` |
 | `gangbang` + `incest` | `incest` |
 | `gangbang` + `netorare` | `NTR` |
-| `gangbang` + `bestiality` | `bestiality` |
 | `gangbang` + `mature_female` (milf) | `group_sex` |
 | `gangbang` + `pokemon_(creature)` / `furry` / `monster_girl` / `android` / `tentacle_sex` | matching override folder |
 | `fellatio` strong, no group | `fellatio` |

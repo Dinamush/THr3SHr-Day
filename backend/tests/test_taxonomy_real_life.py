@@ -54,13 +54,13 @@ REAL_LIFE_FIXTURE: dict = {
             ],
         },
         {
-            "id": "loli",
-            "folder": "loli",
+            "id": "milf",
+            "folder": "milf",
             "priority": 6,
-            "ignore": ["lolita_fashion", "flat_chest", "petite"],
+            "ignore": ["mature_male", "old_woman", "motherly"],
             "evidence": [
-                {"tag": "loli", "weight": 1.0},
-                {"tag": "oppai_loli", "weight": 0.85},
+                {"tag": "milf", "weight": 1.0},
+                {"tag": "mature_female", "weight": 0.85},
             ],
         },
         {
@@ -115,18 +115,18 @@ def test_get_taxonomy_loads_fixture_path(tmp_path: Path) -> None:
 def test_real_life_priority_beats_content_on_tie(real_life_taxonomy) -> None:
     cfg = real_life_taxonomy
     folder, score, secondary = choose_best_destination(
-        {"photorealistic": 0.8, "loli": 0.8, "fellatio": 0.8},
-        {"real_life", "loli", "fellatio"},
+        {"photorealistic": 0.8, "milf": 0.8, "fellatio": 0.8},
+        {"real_life", "milf", "fellatio"},
         taxonomy=cfg,
     )
     assert folder == "real_life"
     assert score == 0.8
-    assert [row["tag"] for row in secondary][:2] == ["fellatio", "loli"]
+    assert [row["tag"] for row in secondary][:2] == ["fellatio", "milf"]
 
 
 def test_hard_evidence_photorealistic_realistic_photo_medium(real_life_taxonomy) -> None:
     cfg = real_life_taxonomy
-    selected = {"real_life", "loli"}
+    selected = {"real_life", "milf"}
 
     folder, score, _ = choose_best_destination(
         {"photorealistic": 0.91}, selected, taxonomy=cfg
@@ -163,7 +163,7 @@ def test_soft_3d_plus_realistic_corroboration_routes(real_life_taxonomy) -> None
     cfg = real_life_taxonomy
     folder, score, _ = choose_best_destination(
         {"realistic": 0.2, "3d": 0.4},
-        {"real_life", "loli"},
+        {"real_life", "milf"},
         taxonomy=cfg,
     )
     assert folder == "real_life"
@@ -185,7 +185,7 @@ def test_ignore_tags_never_score_real_life(real_life_taxonomy) -> None:
     }
     assert score_bucket(ignore_scores, bucket, taxonomy=cfg) is None
     folder, _, _ = choose_best_destination(
-        ignore_scores, {"real_life", "loli"}, taxonomy=cfg
+        ignore_scores, {"real_life", "milf"}, taxonomy=cfg
     )
     assert folder is None
 
@@ -199,7 +199,7 @@ def test_ignore_cooccurrence_does_not_veto_hard_evidence(real_life_taxonomy) -> 
             "blurry": 0.97,
             "semi-realistic": 0.9,
         },
-        {"real_life", "loli"},
+        {"real_life", "milf"},
         taxonomy=cfg,
     )
     assert folder == "real_life"
@@ -239,8 +239,8 @@ def test_semi_real_moderate_realistic_loses_to_stronger_content(
     """Score-first: realistic 0.65 loses to fellatio 0.9 even though realistic is hard."""
     cfg = real_life_taxonomy
     folder, score, _ = choose_best_destination(
-        {"realistic": 0.65, "fellatio": 0.9, "loli": 0.85},
-        {"real_life", "fellatio", "loli"},
+        {"realistic": 0.65, "fellatio": 0.9, "milf": 0.85},
+        {"real_life", "fellatio", "milf"},
         taxonomy=cfg,
     )
     assert folder == "fellatio"
@@ -252,16 +252,16 @@ def test_hard_realism_vs_content_score_first_priority_only_on_ties(
 ) -> None:
     cfg = real_life_taxonomy
     folder, score, _ = choose_best_destination(
-        {"photo_(medium)": 0.86, "fellatio": 0.95, "loli": 0.9},
-        {"real_life", "fellatio", "loli"},
+        {"photo_(medium)": 0.86, "fellatio": 0.95, "milf": 0.9},
+        {"real_life", "fellatio", "milf"},
         taxonomy=cfg,
     )
     assert folder == "fellatio"
     assert score == 0.95
 
     folder, score, _ = choose_best_destination(
-        {"photo_(medium)": 0.96, "fellatio": 0.95, "loli": 0.9},
-        {"real_life", "fellatio", "loli"},
+        {"photo_(medium)": 0.96, "fellatio": 0.95, "milf": 0.9},
+        {"real_life", "fellatio", "milf"},
         taxonomy=cfg,
     )
     assert folder == "real_life"

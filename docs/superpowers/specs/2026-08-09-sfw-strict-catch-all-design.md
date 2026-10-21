@@ -54,7 +54,6 @@ In `backend/app/data/taxonomy.json`:
   - nudity / genitals / sex acts / cum / censor bars
   - underwear / lingerie / bikini / swimsuit / panties / leotard
   - focus/suggestive: `ass_focus`, `cameltoe`, `cleavage`, `sexually_suggestive`, erection/bulge, spread_legs
-  - specialty NSFW already listed (`bestiality`, `loli`, `shota` as veto noise guards — character folders still win via ladder when selected)
 - Do **not** edit Voyeur or act evidence/veto except if a shared soft_veto gap is discovered (prefer SFW-local veto).
 
 ### 2. Taxonomy: `scenery` / `comic`
@@ -80,7 +79,7 @@ Extend `backend/tests/test_taxonomy.py` (existing `FALLBACKS` block):
 | Case | Expected |
 |---|---|
 | `1girl` + `solo` strong | `SFW` |
-| `1girl` + `sex` / `loli` / Voyeur / theme | other folder wins |
+| `1girl` + `sex` / Voyeur / theme | other folder wins |
 | comic / scenery cues | `comic` / `scenery` |
 | `1girl` + `nipples` / `penis` / `cameltoe` | `None` (not SFW) |
 | `1girl` + `bikini` or `lingerie` or `swimsuit` | `None` (strict) |

@@ -21,13 +21,10 @@ SELECTED_ALL = {
     "footjob",
     "tentacles",
     "sex",
-    "loli",
-    "shota",
     "monster_girl",
     "android",
     "furry",
     "Pokemon",
-    "bestiality",
     "Voyeur",
 }
 
@@ -43,8 +40,6 @@ def _reload_default_taxonomy() -> None:
 @pytest.mark.parametrize(
     "scores,expected",
     [
-        ({"loli": 0.92, "flat_chest": 0.99, "lolita_fashion": 0.95}, "loli"),
-        ({"shota": 0.88, "1boy": 0.99, "child": 0.9}, "shota"),
         ({"netorare": 0.81, "caught": 0.99}, "NTR"),
         ({"incest": 0.77, "siblings": 0.99}, "incest"),
         ({"internal_cumshot": 0.9, "cum_in_pussy": 0.95}, "nakadashi"),
@@ -70,7 +65,6 @@ def _reload_default_taxonomy() -> None:
         ({"furry": 0.9, "animal_ears": 0.99}, "furry"),
         ({"pokemon_(creature)": 0.91, "pokemon_ears": 0.99}, "Pokemon"),
         # False-positive clusters must not route
-        ({"lolita_fashion": 0.99, "gothic_lolita": 0.98, "flat_chest": 0.97}, None),
         ({"1boy": 0.99, "male_focus": 0.98, "otoko_no_ko": 0.9}, None),
         ({"animal_ears": 0.99, "fake_animal_ears": 0.9}, None),
         ({"siblings": 0.99}, None),
@@ -85,7 +79,6 @@ def _reload_default_taxonomy() -> None:
         # Surface cum is tease, not a hard act, so the pussy tease folder keeps it.
         ({"pussy": 0.88, "cum": 0.61}, "Voyeur/pussy"),
         ({"soles": 0.9, "feet": 0.85}, "Voyeur/feet"),
-        ({"upskirt": 0.9, "loli": 0.6}, "loli"),
         # Voyeur sub-folder funnel
         ({"highleg_leotard": 0.9, "covered_nipples": 0.7}, "Voyeur/leotard"),
         ({"bikini": 0.95}, "Voyeur/swimsuit"),
@@ -124,7 +117,6 @@ def test_taxonomy_routing_matrix(scores: dict[str, float], expected: str | None)
         ({"scenery": 0.8, "no_humans": 0.95}, "scenery"),
         # Fallbacks yield to any real destination.
         ({"1girl": 0.99, "pantyshot": 0.4}, "Voyeur/panties"),
-        ({"1girl": 0.99, "loli": 0.3}, "loli"),
         ({"1girl": 0.99, "nipples": 0.9}, "Voyeur/nude"),
         # Explicit content with no destination goes to review, never to SFW.
         ({"1girl": 0.99, "censored": 0.6, "penis": 0.2}, None),

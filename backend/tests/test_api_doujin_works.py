@@ -29,11 +29,11 @@ def test_start_doujin_works_run_inserts_work_items(tmp_path: Path) -> None:
 
     fake = DoujinClassifyResult(
         work=DoujinWork(path=work, name=work.name, kind="folder"),
-        scores={"loli": 0.9, "incest": 0.6},
-        primary_tag="loli",
+        scores={"milf": 0.9, "incest": 0.6},
+        primary_tag="milf",
         primary_score=0.9,
         category_tags=[
-            {"tag": "loli", "score": 0.9},
+            {"tag": "milf", "score": 0.9},
             {"tag": "incest", "score": 0.6},
         ],
         needs_review=False,
@@ -72,6 +72,6 @@ def test_start_doujin_works_run_inserts_work_items(tmp_path: Path) -> None:
     assert len(items) == 1
     item = items[0]
     assert item["relative_path"] == "Sample Title"
-    assert item["primary_tag"] == "loli"
+    assert item["primary_tag"] == "milf"
     assert "Doujins" in Path(item["suggested_destination"]).parts
     assert item["status"] == "approved"

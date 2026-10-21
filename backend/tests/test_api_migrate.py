@@ -65,8 +65,8 @@ def test_migrate_copy_approved_only_and_skips_non_approved(tmp_path: Path) -> No
     a.write_bytes(b"aaa")
     b.write_bytes(b"bbb")
     c.write_bytes(b"ccc")
-    dest_loli = cats / "loli"
-    dest_shota = cats / "shota"
+    dest_milf = cats / "milf"
+    dest_incest = cats / "incest"
 
     run_id = _seed_completed_run(
         root,
@@ -74,23 +74,23 @@ def test_migrate_copy_approved_only_and_skips_non_approved(tmp_path: Path) -> No
         [
             {
                 "file_path": str(a),
-                "primary_tag": "loli",
+                "primary_tag": "milf",
                 "primary_score": 0.9,
-                "final_destination": str(dest_loli),
+                "final_destination": str(dest_milf),
                 "status": "approved",
             },
             {
                 "file_path": str(b),
-                "primary_tag": "shota",
+                "primary_tag": "incest",
                 "primary_score": 0.85,
-                "final_destination": str(dest_shota),
+                "final_destination": str(dest_incest),
                 "status": "proposed",
             },
             {
                 "file_path": str(c),
-                "primary_tag": "loli",
+                "primary_tag": "milf",
                 "primary_score": 0.7,
-                "final_destination": str(dest_loli),
+                "final_destination": str(dest_milf),
                 "status": "rejected",
             },
         ],
@@ -106,11 +106,11 @@ def test_migrate_copy_approved_only_and_skips_non_approved(tmp_path: Path) -> No
         assert payload["total_candidates"] == 1
         assert payload["migrated_count"] == 1
         assert payload["failed_count"] == 0
-        assert (dest_loli / "a.jpg").is_file()
-        assert (dest_loli / "a.jpg").read_bytes() == b"aaa"
+        assert (dest_milf / "a.jpg").is_file()
+        assert (dest_milf / "a.jpg").read_bytes() == b"aaa"
         assert a.exists()  # copy keeps source
-        assert not (dest_shota / "b.jpg").exists()
-        assert not (dest_loli / "c.jpg").exists()
+        assert not (dest_incest / "b.jpg").exists()
+        assert not (dest_milf / "c.jpg").exists()
 
         item = fetch_one("SELECT status, migrated_to FROM items WHERE file_path = ?", (str(a),))
         assert item["status"] == "migrated"
@@ -228,13 +228,13 @@ def test_migrate_fails_missing_source_and_missing_destination(tmp_path: Path) ->
         [
             {
                 "file_path": str(missing),
-                "primary_tag": "loli",
-                "final_destination": str(cats / "loli"),
+                "primary_tag": "milf",
+                "final_destination": str(cats / "milf"),
                 "status": "approved",
             },
             {
                 "file_path": str(present),
-                "primary_tag": "loli",
+                "primary_tag": "milf",
                 "final_destination": None,
                 "status": "approved",
             },
@@ -311,7 +311,7 @@ def test_migrate_allows_failed_run(tmp_path: Path) -> None:
     """DB-lock aborted runs still have approved items worth migrating."""
     root = tmp_path / "root"
     cats = tmp_path / "cats"
-    dest = cats / "loli"
+    dest = cats / "milf"
     root.mkdir()
     cats.mkdir()
     src = root / "ok.jpg"
@@ -322,7 +322,7 @@ def test_migrate_allows_failed_run(tmp_path: Path) -> None:
         [
             {
                 "file_path": str(src),
-                "primary_tag": "loli",
+                "primary_tag": "milf",
                 "final_destination": str(dest),
                 "status": "approved",
             }
@@ -431,7 +431,7 @@ def test_approve_secondary_only_then_migrate(tmp_path: Path) -> None:
                 "file_path": str(src),
                 "primary_tag": None,
                 "primary_score": None,
-                "secondary": [{"tag": "loli", "score": 0.45}],
+                "secondary": [{"tag": "milf", "score": 0.45}],
                 "suggested_destination": None,
                 "final_tag": None,
                 "final_destination": None,
@@ -447,8 +447,8 @@ def test_approve_secondary_only_then_migrate(tmp_path: Path) -> None:
         patch.raise_for_status()
         body = patch.json()
         assert body["status"] == "approved"
-        assert body["final_tag"] == "loli"
-        assert body["final_destination"].endswith("loli")
+        assert body["final_tag"] == "milf"
+        assert body["final_destination"].endswith("milf")
         mig = client.post(
             f"/api/runs/{run_id}/migrate",
             json={"mode": "move", "create_missing_folders": True},
@@ -457,7 +457,7 @@ def test_approve_secondary_only_then_migrate(tmp_path: Path) -> None:
         assert mig.json()["migrated_count"] == 1
         assert mig.json()["failed_count"] == 0
         assert not src.exists()
-        assert (cats / "loli" / "weak.jpg").is_file()
+        assert (cats / "milf" / "weak.jpg").is_file()
 
 def test_migrate_reconciles_already_at_destination(tmp_path: Path) -> None:
     """Source gone but file already in destination → mark migrated."""
