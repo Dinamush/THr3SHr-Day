@@ -160,7 +160,7 @@ def test_categories_exclude_dirs_skips_parent_categories_root(tmp_path: Path) ->
     """Inbox under categories_root must not exclude the whole tree (0-image runs)."""
     art = tmp_path / "library"
     inbox = art / "inbox" / "unsorted"
-    dest = art / "removed"
+    dest = art / "milf"
     inbox.mkdir(parents=True)
     dest.mkdir(parents=True)
     Image.new("RGB", (8, 8), color="red").save(inbox / "a.jpg")
@@ -312,8 +312,8 @@ def test_destination_path_supports_nested_taxonomy_folders(tmp_path: Path) -> No
 
     nested = destination_path(tmp_path, "Voyeur/panties")
     assert nested == tmp_path / "Voyeur" / "panties"
-    flat = destination_path(tmp_path, "removed")
-    assert flat == tmp_path / "removed"
+    flat = destination_path(tmp_path, "milf")
+    assert flat == tmp_path / "milf"
     # Path separators are preserved as nesting; only illegal chars are sanitized.
     weird = destination_path(tmp_path, "Voyeur/panty:shot")
     assert weird == tmp_path / "Voyeur" / "panty_shot"
@@ -350,14 +350,14 @@ def test_scaled_media_sample_count_grows_with_length(monkeypatch) -> None:
 def test_pool_frame_scores_uses_presence_corroboration() -> None:
     pooled = pool_frame_scores(
         [
-            {"removed": 0.9, "1girl": 0.8},
+            {"milf": 0.9, "1girl": 0.8},
             {"1girl": 0.7},
-            {"removed": 0.0, "1girl": 0.6},
+            {"milf": 0.0, "1girl": 0.6},
             {},
         ]
     )
-    # Single-frame removed spike suppressed (omitted from pooled map).
-    assert "removed" not in pooled
+    # Single-frame milf spike suppressed (omitted from pooled map).
+    assert "milf" not in pooled
     # 1girl hits on 3 frames → top-3 mean.
     assert abs(pooled["1girl"] - ((0.8 + 0.7 + 0.6) / 3)) < 1e-6
 
@@ -398,7 +398,7 @@ def test_experimental_media_gif_pools_frame_scores(monkeypatch, tmp_path: Path) 
         assert kwargs.get("raw_general") is True
         out = []
         for idx, _img in enumerate(images):
-            out.append({"removed": 0.85 if idx % 2 == 0 else 0.05, "1girl": 0.5})
+            out.append({"milf": 0.85 if idx % 2 == 0 else 0.05, "1girl": 0.5})
         return out
 
     class _Engine:
@@ -413,7 +413,7 @@ def test_experimental_media_gif_pools_frame_scores(monkeypatch, tmp_path: Path) 
         tagger_model=TAGGER_MODEL_WD_SWINV2,
         sample_count=4,
     )
-    assert "removed" in scores
+    assert "milf" in scores
     assert "1girl" in scores
-    assert scores["removed"] > 0.5
+    assert scores["milf"] > 0.5
     assert scores["1girl"] >= 0.5

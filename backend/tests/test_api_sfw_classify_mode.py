@@ -24,7 +24,7 @@ def _base_settings(tmp_path: Path, **overrides):
         "experimental_style_detector_enabled": False,
         "hybrid_ml_on_review": True,
         "tagging_domain": "drawn",
-        "selected_tags": ["removed", "sex", "group_sex"],
+        "selected_tags": ["incest", "sex", "group_sex"],
         "selected_tags_nsfw": [],
         "sfw_classify_mode": False,
         "max_inference_workers": 2,
@@ -41,7 +41,7 @@ def test_sfw_classify_mode_parks_nsfw_and_forces_safe_folders(tmp_path: Path):
     with TestClient(app) as client:
         resp = client.put("/api/settings", json=_base_settings(tmp_path))
         assert resp.status_code == 200
-        assert "removed" in resp.json()["selected_tags"]
+        assert "incest" in resp.json()["selected_tags"]
 
         resp = client.put(
             "/api/settings",
@@ -49,7 +49,7 @@ def test_sfw_classify_mode_parks_nsfw_and_forces_safe_folders(tmp_path: Path):
                 tmp_path,
                 sfw_classify_mode=True,
                 selected_tags=["SFW", "scenery"],
-                selected_tags_nsfw=["removed", "sex", "group_sex", "milf"],
+                selected_tags_nsfw=["incest", "sex", "group_sex", "milf"],
             ),
         )
         assert resp.status_code == 200
@@ -57,34 +57,34 @@ def test_sfw_classify_mode_parks_nsfw_and_forces_safe_folders(tmp_path: Path):
         assert body["sfw_classify_mode"] is True
         assert body["selected_tags"] == ["SFW", "scenery"]
         assert "comic" not in body["selected_tags"]
-        assert body["selected_tags_nsfw"] == ["removed", "sex", "group_sex", "milf"]
+        assert body["selected_tags_nsfw"] == ["incest", "sex", "group_sex", "milf"]
 
         resp = client.put(
             "/api/settings",
             json=_base_settings(
                 tmp_path,
                 sfw_classify_mode=True,
-                selected_tags=["removed", "fellatio", "SFW", "comic"],
-                selected_tags_nsfw=["removed", "sex"],
+                selected_tags=["incest", "fellatio", "SFW", "comic"],
+                selected_tags_nsfw=["incest", "sex"],
             ),
         )
         assert resp.status_code == 200
         body = resp.json()
         assert body["selected_tags"] == ["SFW", "scenery"]
         assert "comic" not in body["selected_tags"]
-        assert "removed" not in body["selected_tags"]
+        assert "incest" not in body["selected_tags"]
 
         resp = client.put(
             "/api/settings",
             json=_base_settings(
                 tmp_path,
                 sfw_classify_mode=False,
-                selected_tags=["removed", "sex", "group_sex", "milf"],
-                selected_tags_nsfw=["removed", "sex", "group_sex", "milf"],
+                selected_tags=["incest", "sex", "group_sex", "milf"],
+                selected_tags_nsfw=["incest", "sex", "group_sex", "milf"],
             ),
         )
         assert resp.status_code == 200
         body = resp.json()
         assert body["sfw_classify_mode"] is False
-        assert "removed" in body["selected_tags"]
+        assert "incest" in body["selected_tags"]
         assert "milf" in body["selected_tags"]

@@ -7,6 +7,8 @@ those soft tags from ML into WD scores.
 
 from __future__ import annotations
 
+from .content_blocklist import is_blocked_tag
+
 # Tags where ML recall@0.35 beat WD and FP rates stayed low on the curated suite.
 HYBRID_ML_ALLOWLIST: frozenset[str] = frozenset(
     {
@@ -67,7 +69,6 @@ HYBRID_ML_ALLOWLIST: frozenset[str] = frozenset(
         # Other preferred folders with strong ML recall
         "furry",
         "pokemon_(creature)",
-        "removed",
         "animal_penis",
         "incest",
         "twincest",
@@ -135,13 +136,17 @@ def merge_ml_allowlist_scores(
     allowlist: frozenset[str] | set[str] | None = None,
     denylist: frozenset[str] | set[str] | None = None,
 ) -> dict[str, float]:
-    """Copy WD scores; for allowlisted tags take max(WD, ML). Deny Voyeur soft tags."""
+    """Copy WD scores; for allowlisted tags take max(WD, ML). Deny Voyeur soft tags.
+
+    Content-blocklist tags always take max(WD, ML), so an ML hit the WD tagger
+    missed still refuses the item.
+    """
     allow = allowlist if allowlist is not None else HYBRID_ML_ALLOWLIST
     deny = denylist if denylist is not None else HYBRID_ML_DENYLIST
     merged = {str(k): float(v) for k, v in wd_scores.items()}
     for tag, score in ml_scores.items():
         key = str(tag)
-        if key in deny or key not in allow:
+        if key in deny or (key not in allow and not is_blocked_tag(key)):
             continue
         try:
             ml_val = float(score)

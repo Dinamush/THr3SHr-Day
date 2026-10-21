@@ -5,8 +5,6 @@
 | P | Bucket | Rationale |
 |---|--------|-----------|
 | 0 | real_life | Quarantine / style gate destination |
-| 1 | **removed** | User-prioritized content |
-| 2 | **removed** | User-prioritized content |
 | 3 | fertilization | Rare, highly specific |
 | 4 | NTR | Specific relationship tag |
 | 5 | incest | Specific relationship tag |
@@ -20,14 +18,11 @@
 
 - Cross-checked **tags.csv** post counts and **WD SwinV2 `selected_tags.csv`** vocab.
 - Only keep evidence tags that WD can emit (or are soft corroboration with a hard tag).
-- Removed `toddler` / `removed` (in tags.csv but **absent from WD** → never registered).
 - Replaced `cheating` with WD tag `cheating_(relationship)`.
 - Dropped rare/non-WD incest edges (`group_incest`, uncle/aunt/grand*) for cleaner routing.
 
 ## Notable evidence adds (WD counts)
 
-- removed: `removed`, `mesugaki`, `removed`
-- removed: `removed` (~10k), `removed`, keep `miniboy`
 - fellatio: `cooperative_fellatio`
 - furry: soft `body_fur`, `digitigrade`
 - pokemon: `clothed_pokemon`, `riding_pokemon`

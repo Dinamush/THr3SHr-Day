@@ -5,7 +5,7 @@ Status: approved to implement (user: nested Option A, soft catch-all trumped by 
 
 ## Goal
 
-Route sexy-pose / tease content into nested destinations under `Voyeur/`, while hard character and act folders (`removed`, `fellatio`, `NTR`, etc.) always win when they also score.
+Route sexy-pose / tease content into nested destinations under `Voyeur/`, while hard character and act folders (`fellatio`, `NTR`, etc.) always win when they also score.
 
 ## Folder layout
 

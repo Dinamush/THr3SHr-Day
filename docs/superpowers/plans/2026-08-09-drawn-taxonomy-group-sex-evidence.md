@@ -54,10 +54,7 @@ GROUP_SEX_SELECTED = {
     "paizuri",
     "footjob",
     "fertilization",
-    "removed",
-    "removed",
     "incest",
-    "removed",
     "NTR",
     "Pokemon",
     "furry",
@@ -119,11 +116,8 @@ def test_sex_still_wins_without_group_markers() -> None:
 
 def test_group_sex_loses_to_overrides() -> None:
     cases = [
-        ({"gangbang": 0.95, "removed": 0.9}, "removed"),
-        ({"gangbang": 0.95, "removed": 0.9}, "removed"),
         ({"gangbang": 0.95, "incest": 0.9}, "incest"),
         ({"gangbang": 0.95, "netorare": 0.85}, "NTR"),
-        ({"gangbang": 0.95, "removed": 0.9}, "removed"),
         ({"gangbang": 0.95, "pokemon_(creature)": 0.9}, "Pokemon"),
         ({"gangbang": 0.95, "furry": 0.9}, "furry"),
         ({"gangbang": 0.95, "monster_girl": 0.9}, "monster_girl"),
@@ -219,12 +213,11 @@ In `taxonomy.json`, change the `milf` bucket to:
   "veto_threshold": 0.35,
   "veto": [
     "gangbang", "group_sex", "orgy", "threesome", "mmf_threesome", "ffm_threesome",
-    "spitroast", "reverse_spitroast", "double_penetration", "triple_penetration",
-    "removed", "removed", "removed"
+    "spitroast", "reverse_spitroast", "double_penetration", "triple_penetration"
   ],
   "ignore": [
     "mature_male", "old_man", "old_woman", "1girl", "1boy", "motherly",
-    "age_difference", "removed", "removed", "removed"
+    "age_difference"
   ],
   "evidence": [
     { "tag": "mature_female", "weight": 1.0 },
@@ -248,11 +241,9 @@ Insert this object as a new element in the `buckets` array, immediately before t
   "aliases": ["gangbang", "Group_sex", "orgy", "Group Sex"],
   "veto_threshold": 0.35,
   "veto": [
-    "removed", "removed", "removed", "mesugaki",
-    "removed", "removed", "removed", "miniboy",
     "incest", "twincest", "mother_and_son", "father_and_daughter",
     "brother_and_sister", "mother_and_daughter", "father_and_son",
-    "removed", "animal_penis", "knot",
+    "animal_penis", "knot",
     "netorare", "cheating_(relationship)",
     "pokemon_(creature)", "pokephilia",
     "furry", "furry_female", "furry_male",
@@ -326,7 +317,7 @@ For each of these buckets — `fertilization`, `nakadashi`, `fellatio`, `paizuri
 
 If a bucket already has `"veto"`, merge the tags (do not wipe existing entries). If it has no `veto_threshold`, add `0.35`.
 
-Do **not** add GROUP_VETO to override folders (`removed`, `removed`, `incest`, `removed`, `NTR`, `Pokemon`, `furry`, `monster_girl`, `android`, `tentacles`).
+Do **not** add GROUP_VETO to override folders (`incest`, `NTR`, `Pokemon`, `furry`, `monster_girl`, `android`, `tentacles`).
 
 - [ ] **Step 5: Run Task 1 tests**
 
@@ -457,14 +448,6 @@ only as gated via `gate_tags: ["internal_cumshot", "cum_in_pussy"]` — if that 
 
 Do **not** add if `oral` stays in `ignore` (it currently is ignored). Leave fellatio as-is unless a high-precision missing tag exists (e.g. `ball_suck` / `penis_in_mouth` if present in `tags.csv`).
 
-**`removed` / `removed`:** add only high-precision missing variants found in vocab that are not already ignored, e.g. if present:
-
-```json
-{ "tag": "removed", "weight": 0.7 }
-```
-
-for removed — **only if** in `tags.csv`. Otherwise leave character buckets unchanged beyond existing tests.
-
 **`incest.evidence` — add if in vocab and missing:**
 
 ```json
@@ -487,8 +470,6 @@ if that tag exists in vocabulary (alias may already resolve folder but not score
 
 (already present — verify only).
 
-**`removed.gated_evidence` — add animals in vocab if missing:** e.g. `fox`, `bear` at weight `0.5`.
-
 **`Pokemon`:** no structural change required if evidence already dense; verify `pokephilia` + `pokemon_(creature)` still win vs `group_sex` (covered in Task 1).
 
 **`furry` / `android` / `tentacles` / `monster_girl` / `NTR` / `paizuri` / `footjob`:** additive high-precision tags only; do not weaken ignore lists that prevent soft solos.
@@ -496,7 +477,7 @@ if that tag exists in vocabulary (alias may already resolve folder but not score
 Practical minimum for this task (acceptable if vocab is thin):
 
 1. milf gated expansion (Step 3) — required  
-2. At least one real additive evidence tag each for: `removed` (gated animal), `incest` (only if safe), `nakadashi` OR `fellatio` — if none safe, document skip in commit message and keep tests green  
+2. At least one real additive evidence tag each for: `incest` (only if safe), `nakadashi` OR `fellatio` — if none safe, document skip in commit message and keep tests green  
 3. Ensure override primary tags remain on `group_sex.veto` (already Task 2)
 
 - [ ] **Step 5: Run taxonomy + vocabulary tests**
@@ -561,14 +542,11 @@ Update `DOUJIN_FAVOURITE_FOLDERS` in `backend/app/doujin_works.py` to include `"
 
 ```python
 DOUJIN_FAVOURITE_FOLDERS: tuple[str, ...] = (
-    "removed",
-    "removed",
     "milf",
     "group_sex",
     "fertilization",
     "monster_girl",
     "incest",
-    "removed",
     "Pokemon",
     "NTR",
     "tentacles",
@@ -583,7 +561,7 @@ Note: Doujin favourites currently omit `sex` / `fellatio` / etc. That is OK — 
 
 ```bash
 cd backend
-python -m pytest tests/test_doujin_works.py::test_doujin_favourites_include_group_sex tests/test_doujin_works.py::test_milf_and_inseki_taxonomy_routing tests/test_doujin_works.py::removed tests/test_doujin_works.py::test_doujin_favourites_include_ntr_tentacles_furry_android -v
+python -m pytest tests/test_doujin_works.py::test_doujin_favourites_include_group_sex tests/test_doujin_works.py::test_milf_and_inseki_taxonomy_routing tests/test_doujin_works.py::test_doujin_favourites_include_pokemon tests/test_doujin_works.py::test_doujin_favourites_include_ntr_tentacles_furry_android -v
 ```
 
 Expected: PASS.  
@@ -656,9 +634,8 @@ If Step 2 was unnecessary, skip commit.
 Restart backend (taxonomy is loaded at process start / `reload_taxonomy`). Reclassify a small needs-review slice from run 125/126:
 
 1. Group-heavy → `group_sex` when selected  
-2. `gangbang` + `removed` → `removed`  
-3. `gangbang` + `mature_female` → `group_sex`  
-4. Voyeur soft item → unchanged Voyeur folder  
+2. `gangbang` + `mature_female` → `group_sex`  
+3. Voyeur soft item → unchanged Voyeur folder  
 
 No code change required for this step.
 

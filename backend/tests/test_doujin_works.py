@@ -44,14 +44,8 @@ def test_milf_and_inseki_taxonomy_routing() -> None:
     assert folder == "incest"
 
 
-def removed() -> None:
-    assert "removed" in DOUJIN_FAVOURITE_FOLDERS
+def test_doujin_favourites_include_pokemon() -> None:
     assert "Pokemon" in DOUJIN_FAVOURITE_FOLDERS
-    folder, score, _ = choose_best_destination(
-        {"removed": 0.89, "animal_penis": 0.7}, set(DOUJIN_FAVOURITE_FOLDERS)
-    )
-    assert folder == "removed"
-    assert score is not None and score > 0.5
     folder, score, _ = choose_best_destination(
         {"pokephilia": 0.88, "pokemon_(creature)": 0.96},
         set(DOUJIN_FAVOURITE_FOLDERS),
@@ -145,7 +139,7 @@ def test_classify_doujin_work_pools_and_sets_primary(tmp_path: Path) -> None:
     work = DoujinWork(path=folder, name=folder.name, kind="folder")
 
     def fake_extract(image, **kwargs):
-        return {"incest": 0.9, "removed": 0.4, "milf": 0.2}
+        return {"incest": 0.9, "milf": 0.2}
 
     with patch("app.doujin_works.extract_scores", side_effect=fake_extract):
         result = classify_doujin_work(
@@ -159,18 +153,18 @@ def test_classify_doujin_work_pools_and_sets_primary(tmp_path: Path) -> None:
 
 
 def test_doujin_destination_layout(tmp_path: Path) -> None:
-    dest = doujin_destination(tmp_path, "removed", "My Work")
-    assert dest == tmp_path / "Doujins" / "removed" / "My Work"
+    dest = doujin_destination(tmp_path, "milf", "My Work")
+    assert dest == tmp_path / "Doujins" / "milf" / "My Work"
     assert doujin_destination_folder(tmp_path, "monster_girl") == (
         tmp_path / "Doujins" / "monster_girl"
     )
 
 
 def test_create_tag_link_and_sidecar(tmp_path: Path) -> None:
-    target = tmp_path / "Doujins" / "removed" / "WorkA"
+    target = tmp_path / "Doujins" / "milf" / "WorkA"
     target.mkdir(parents=True)
     _rgb(target / "cover.jpg")
-    write_tags_sidecar(target, ["removed", "incest"])
+    write_tags_sidecar(target, ["milf", "incest"])
     assert (target / "tags.json").is_file()
 
     link = tmp_path / "Doujins" / "incest" / "WorkA"
@@ -188,7 +182,7 @@ def test_migrate_doujin_folder_moves_and_junctions(tmp_path: Path) -> None:
     work.mkdir()
     _rgb(work / "01.jpg")
 
-    dest_folder = cats / "Doujins" / "removed"
+    dest_folder = cats / "Doujins" / "milf"
     run_id = execute(
         """
         INSERT INTO runs (
@@ -210,12 +204,12 @@ def test_migrate_doujin_folder_moves_and_junctions(tmp_path: Path) -> None:
             run_id,
             str(work),
             work.name,
-            "removed",
+            "milf",
             0.9,
             to_json([{"tag": "incest", "score": 0.7}]),
             to_json({}),
             str(dest_folder),
-            "removed",
+            "milf",
             str(dest_folder),
         ),
     )
@@ -227,7 +221,7 @@ def test_migrate_doujin_folder_moves_and_junctions(tmp_path: Path) -> None:
     assert body["migrated_count"] == 1
     assert body["failed_count"] == 0
 
-    moved = cats / "Doujins" / "removed" / "BigTitle"
+    moved = cats / "Doujins" / "milf" / "BigTitle"
     assert moved.is_dir()
     assert not work.exists()
     junction = cats / "Doujins" / "incest" / "BigTitle"

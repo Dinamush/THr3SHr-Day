@@ -26,7 +26,7 @@ def test_normal_infer_does_not_cap_media_sample_count(monkeypatch, tmp_path: Pat
 
     _infer_one_image(
         media,
-        {"removed"},
+        {"milf"},
         0.6,
         experimental_media_enabled=True,
         hybrid_real_life=False,

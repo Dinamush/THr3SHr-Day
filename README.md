@@ -85,6 +85,10 @@ Related settings:
 - Best selected score **&lt; confidence_threshold`** → no primary; suggestion in secondary.
 - Review payload always includes **global top-5** tags so mis-assignments are diagnosable.
 - Each run stores `tagger_model` for provenance.
+- **Content blocklist (always on):** THR3SHR refuses sexual content involving minors, drawn included, and sexual content involving animals.
+  An item whose tagger scores carry a blocked tag (at 0.35 or above) is skipped and never stored, suggested or migrated, and a file in a folder named after a blocked term or source is never scanned.
+  No destination, selected tag or setting can name a blocked term, and there is no option to turn the blocklist off.
+  The term lists live in `backend/app/content_blocklist.py`.
 
 ## Quick Start
 

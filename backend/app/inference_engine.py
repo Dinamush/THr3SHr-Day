@@ -14,6 +14,8 @@ import pandas as pd
 from PIL import Image
 from huggingface_hub import hf_hub_download
 
+from .content_blocklist import BLOCK_SCORE_FLOOR, is_blocked_tag
+
 logger = logging.getLogger(__name__)
 
 TAGGER_MODEL_ML = "ml_danbooru"
@@ -191,7 +193,7 @@ class InferenceEngine:
         self._meta_lock = threading.Lock()
         self._sessions: dict[str, Any] = {}
         self._wd_labels: dict[str, tuple[list[str], list[int], list[int], list[int]]] = {}
-        self._wd_general: dict[str, tuple[np.ndarray, list[str], np.ndarray]] = {}
+        self._wd_general: dict[str, tuple[np.ndarray, list[str], np.ndarray, np.ndarray]] = {}
         self._ml_labels: list[str] | None = None
         self._wd_target_size: dict[str, int] = {}
 
@@ -334,7 +336,7 @@ class InferenceEngine:
         self, wd_name: str, pred: np.ndarray, general_threshold: float, raw_general: bool
     ) -> dict[str, float]:
         """Normalized general-tag scores above the threshold for one prediction row."""
-        general_idx, keys, realism = self._get_wd_general_labels(wd_name)
+        general_idx, keys, realism, blocked = self._get_wd_general_labels(wd_name)
         # float64 first, so threshold comparisons match float(score) exactly.
         values = pred[general_idx].astype(np.float64)
         if raw_general:
@@ -342,9 +344,13 @@ class InferenceEngine:
             kept = range(len(values))
         else:
             # Keep weak-but-discriminative realism for accidental photos
-            # (moon/sky etc.) without lowering the global general threshold.
+            # (moon/sky etc.) without lowering the global general threshold,
+            # and content-blocklist tags from their own floor so a raised
+            # threshold cannot hide one.
             kept = np.flatnonzero(
-                (values > general_threshold) | (realism & (values >= WD_REALISM_FLOOR))
+                (values > general_threshold)
+                | (realism & (values >= WD_REALISM_FLOOR))
+                | (blocked & (values >= BLOCK_SCORE_FLOOR))
             ).tolist()
         general: dict[str, float] = {}
         for j in kept:
@@ -423,8 +429,11 @@ class InferenceEngine:
             self._wd_labels[wd_name] = packed
             return packed
 
-    def _get_wd_general_labels(self, wd_name: str) -> tuple[np.ndarray, list[str], np.ndarray]:
-        """General-tag indexes, their normalized names and the realism mask.
+    def _get_wd_general_labels(
+        self, wd_name: str
+    ) -> tuple[np.ndarray, list[str], np.ndarray, np.ndarray]:
+        """General-tag indexes, their normalized names, the realism mask and
+        the content-blocklist mask.
 
         Normalizing ~8k names per image (per frame for media) cost more than
         the rest of postprocessing, so it happens once per model.
@@ -439,6 +448,7 @@ class InferenceEngine:
                 np.asarray(general_idx, dtype=np.intp),
                 [_normalize_tag(str(name)) for name in names],
                 np.array([name in WD_REALISM_ALWAYS_TAGS for name in names], dtype=bool),
+                np.array([is_blocked_tag(str(name)) for name in names], dtype=bool),
             )
             self._wd_general[wd_name] = packed
             return packed

@@ -546,7 +546,6 @@ function App() {
         "fertilization",
         "monster_girl",
         "incest",
-        "removed",
         "Pokemon",
         "NTR",
         "tentacles",

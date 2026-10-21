@@ -413,9 +413,9 @@ def test_theme_beats_higher_scoring_soft() -> None:
 
 def test_higher_theme_score_still_beats_act() -> None:
     """Theme vs act stays score-based (no theme-over-act override)."""
-    selected = {"Pokemon", "removed", "furry"}
+    selected = {"Pokemon", "fellatio", "furry"}
     folder, score, _ = choose_best_destination(
-        {"removed": 0.95, "pokemon_(creature)": 0.97, "dog": 0.9},
+        {"fellatio": 0.95, "pokemon_(creature)": 0.97},
         selected,
     )
     assert folder == "Pokemon"
@@ -430,23 +430,6 @@ def test_act_still_wins_without_character() -> None:
     )
     assert folder == "NTR"
     assert score == 0.8
-
-
-def removed() -> None:
-    selected = {"removed", "furry", "fellatio"}
-    # Bare animal must not route.
-    assert choose_best_destination({"dog": 0.95, "animal": 0.8}, selected)[0] is None
-
-    folder, score, _ = choose_best_destination(
-        {"dog": 0.92, "sex": 0.9, "penis": 0.85, "1girl": 0.9},
-        selected,
-    )
-    assert folder == "removed"
-    assert score is not None and score >= 0.4
-
-    folder, score, _ = choose_best_destination({"removed": 0.88, "dog": 0.5}, selected)
-    assert folder == "removed"
-    assert score == 0.88
 
 
 def test_pokemon_pokephilia_and_creature_alias() -> None:
@@ -480,7 +463,6 @@ GROUP_SEX_SELECTED = {
     "footjob",
     "fertilization",
     "incest",
-    "removed",
     "NTR",
     "Pokemon",
     "furry",
@@ -544,7 +526,6 @@ def test_group_sex_loses_to_overrides() -> None:
     cases = [
         ({"gangbang": 0.95, "incest": 0.9}, "incest"),
         ({"gangbang": 0.95, "netorare": 0.85}, "NTR"),
-        ({"gangbang": 0.95, "removed": 0.9}, "removed"),
         ({"gangbang": 0.95, "pokemon_(creature)": 0.9}, "Pokemon"),
         ({"gangbang": 0.95, "furry": 0.9}, "furry"),
         ({"gangbang": 0.95, "monster_girl": 0.9}, "monster_girl"),
@@ -1138,7 +1119,6 @@ def test_sfw_vetoes_favourite_folder_signals() -> None:
         {"1girl": 0.99, "mecha_musume": 0.5},
         {"1girl": 0.99, "tentacle_sex": 0.5},
         {"1girl": 0.99, "tentacles": 0.5},
-        {"1girl": 0.99, "removed": 0.5},
         {"1girl": 0.99, "interspecies": 0.5},
         {"1girl": 0.99, "impregnation": 0.5},
         {"1girl": 0.99, "pantyshot": 0.5},

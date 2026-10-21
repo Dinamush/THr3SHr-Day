@@ -13,6 +13,7 @@ from pathlib import Path
 
 from PIL import Image
 
+from .content_blocklist import blocked_reason_for_path, is_blocked_destination
 from .media_pooling import pool_presence
 from .services import SUPPORTED_IMAGE_EXTENSIONS, extract_scores
 from .taxonomy import choose_best_destination, resolve_taxonomy_folder
@@ -27,7 +28,6 @@ DOUJIN_FAVOURITE_FOLDERS: tuple[str, ...] = (
     "fertilization",
     "monster_girl",
     "incest",
-    "removed",
     "Pokemon",
     "NTR",
     "tentacles",
@@ -66,7 +66,7 @@ def scan_doujin_works(root: Path) -> list[DoujinWork]:
         raise ValueError(f"Doujin root is not a directory: {root}")
     works: list[DoujinWork] = []
     for child in sorted(root.iterdir(), key=lambda p: p.name.lower()):
-        if child.name.startswith("."):
+        if child.name.startswith(".") or blocked_reason_for_path(str(child)):
             continue
         if child.is_dir():
             if _folder_image_paths(child):
@@ -256,6 +256,7 @@ def create_tag_link(link_path: Path, target: Path) -> None:
 
 
 def write_tags_sidecar(work_path: Path, tags: list[str]) -> None:
+    tags = [tag for tag in tags if not is_blocked_destination(tag)]
     if work_path.is_dir():
         sidecar = work_path / "tags.json"
     else:

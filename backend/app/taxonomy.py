@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from .content_blocklist import is_blocked_destination
+
 DEFAULT_TAXONOMY_PATH = Path(__file__).resolve().parent / "data" / "taxonomy.json"
 
 
@@ -134,6 +136,8 @@ def _parse_bucket(
         raise ValueError("taxonomy bucket requires non-empty id and folder")
     if not evidence and not gated_evidence:
         raise ValueError(f"taxonomy bucket {bucket_id!r} requires at least one evidence tag")
+    if any(is_blocked_destination(name) for name in (bucket_id, folder, *aliases)):
+        raise ValueError(f"taxonomy bucket {bucket_id!r} names a content-blocklist term")
     if role == "soft":
         veto = frozenset(veto | soft_veto)
     veto_threshold_raw = raw.get("veto_threshold")
@@ -371,7 +375,7 @@ def choose_best_destination(
 
     for sel in selected:
         name = (sel or "").strip()
-        if not name:
+        if not name or is_blocked_destination(name):
             continue
         bucket = resolve_taxonomy_folder(name, taxonomy=cfg)
         if bucket is not None:
@@ -387,7 +391,7 @@ def choose_best_destination(
 
         # Legacy exact selected-tag match.
         raw = _lookup_score(scores, name)
-        if raw is None or _normalize_tag_name(name) in {"removed", "removed"}:
+        if raw is None:
             continue
         folder_key = _normalize_tag_name(name)
         if folder_key in seen_folders:

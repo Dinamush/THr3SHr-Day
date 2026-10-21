@@ -11,8 +11,6 @@ Add a `doujin_works` run mode that treats each child folder or top-level `.cbz`/
 
 | UI / alias | Destination folder |
 |------------|--------------------|
-| removed | `removed` |
-| removed | `removed` |
 | milf | `milf` (new taxonomy bucket) |
 | impregnation | `fertilization` |
 | monster girl | `monster_girl` |
